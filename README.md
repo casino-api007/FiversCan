@@ -1,4 +1,4 @@
-# NexusGGR Casino API Aggregator — Slots, Live Casino & Sportsbook API
+# NexusGGR FiversCan Casino API Aggregator — Slots, Live Casino & Sportsbook API
 
 <p align="center">
   <img src="nexusggr.webp" alt="NexusGGR Casino API Aggregator — iGaming slots, live casino and sportsbook whitelabel API platform" width="700"/>
