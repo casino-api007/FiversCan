@@ -6,7 +6,7 @@
 
 **NexusGGR** is a unified **casino API aggregator** for iGaming operators, agents, and platform owners. Integrate **slots API**, **live casino API**, **sportsbook API**, and **whitelabel betting** solutions through a single integration — powered by leading providers including **Pragmatic Play**, **PG Soft**, and more.
 
-🌐 **[Live Demo](https://nexusggr.games?utm_source=github&utm_medium=readme&utm_campaign=casino-api)** &nbsp;|&nbsp; 📢 **[Telegram Channel](https://t.me/casino_api777)** &nbsp;|&nbsp; 💬 **[Contact Us](https://t.me/nexusggr777)**
+🌐 **[Live Demo](https://nexusggr.games?utm_source=github&utm_medium=readme&utm_campaign=casino-api)** &nbsp;|&nbsp; 📢 **[Telegram Channel](https://t.me/casino_api777)** &nbsp;|&nbsp; 💬 **[Contact Us](https://t.me/nexusggr888)**
 
 ---
 
@@ -60,7 +60,7 @@ Built for **FiversCan**-compatible workflows and modern aggregator architectures
 |----------|------|
 | 🎰 **Live Demo & Platform** | [nexusggr.games](https://nexusggr.games?utm_source=github&utm_medium=readme&utm_campaign=casino-api) |
 | 📢 **Telegram Channel** (updates & API news) | [@casino_api777](https://t.me/casino_api777) |
-| 💬 **Contact / Business Inquiry** | [@nexusggr777](https://t.me/nexusggr888) |
+| 💬 **Contact / Business Inquiry** | [@nexusggr888](https://t.me/nexusggr888) |
 
 ## Frequently Asked Questions
 
@@ -82,7 +82,7 @@ NexusGGR serves global iGaming markets including Asia, Europe, and LATAM — wit
 
 ### How do I get started?
 
-Visit the [live demo](https://nexusggr.games?utm_source=github&utm_medium=readme&utm_campaign=casino-api), join our [Telegram channel](https://t.me/casino_api777) for updates, or [contact us on Telegram](https://t.me/nexusggr777) for API access and commercial terms.
+Visit the [live demo](https://nexusggr.games?utm_source=github&utm_medium=readme&utm_campaign=casino-api), join our [Telegram channel](https://t.me/casino_api777) for updates, or [contact us on Telegram](https://t.me/nexusggr888) for API access and commercial terms.
 
 ---
 
