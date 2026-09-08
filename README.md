@@ -60,7 +60,7 @@ Built for **FiversCan**-compatible workflows and modern aggregator architectures
 |----------|------|
 | 🎰 **Live Demo & Platform** | [nexusggr.games](https://nexusggr.games?utm_source=github&utm_medium=readme&utm_campaign=casino-api) |
 | 📢 **Telegram Channel** (updates & API news) | [@casino_api777](https://t.me/casino_api777) |
-| 💬 **Contact / Business Inquiry** | [@nexusggr777](https://t.me/nexusggr777) |
+| 💬 **Contact / Business Inquiry** | [@nexusggr777](https://t.me/nexusggr888) |
 
 ## Frequently Asked Questions
 
