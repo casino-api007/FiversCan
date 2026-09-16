@@ -27,6 +27,37 @@ Built for **FiversCan**-compatible workflows and modern aggregator architectures
 - **Agent & Operator Panels** — Manage players, agents, reports, and settlements
 - **Fast Deployment** — Launch your iGaming platform in days, not months
 
+## Integration Code Samples (22 Languages)
+
+Every `index.*` file in this repository is a complete, runnable **FiversCan API** client that walks the same seven calls an operator needs to go live: `provider_list` → `game_list` → `user_create` → `user_deposit` → `game_launch` → `money_info` → `user_withdraw`.
+
+The API contract is identical in every language — `POST https://{API_SERVER}` with a JSON body carrying `method`, `agent_code` and `agent_token`, answered by `{"status": 1, "msg": "SUCCESS", ...}` on success or `{"status": 0, "msg": "<ERROR>"}` on failure. Set `FVS_API_URL`, `FVS_AGENT_CODE` and `FVS_AGENT_TOKEN` in the environment and run the file.
+
+| Language | File | Stack |
+|----------|------|-------|
+| JavaScript (Node.js) | [index.js](index.js) | built-in `fetch` |
+| TypeScript | [index.ts](index.ts) | `fetch`, typed responses |
+| Python | [index.py](index.py) | `urllib` (stdlib) |
+| PHP | [index.php](index.php) | `ext-curl` + `ext-json` |
+| Go | [index.go](index.go) | `net/http` + `encoding/json` |
+| Java | [Index.java](Index.java) | `java.net.http` + `org.json` |
+| Kotlin | [index.kt](index.kt) | `java.net.http` + `kotlinx.serialization.json` |
+| C# (.NET) | [index.cs](index.cs) | `HttpClient` + `System.Text.Json` |
+| Ruby | [index.rb](index.rb) | `net/http` + `json` (stdlib) |
+| Rust | [index.rs](index.rs) | `reqwest` + `serde_json` |
+| Swift | [index.swift](index.swift) | `URLSession` + `JSONSerialization` |
+| Dart | [index.dart](index.dart) | `dart:io` + `dart:convert` |
+| C++ | [index.cpp](index.cpp) | `libcurl` + `nlohmann/json` |
+| C | [index.c](index.c) | `libcurl` + `cJSON` |
+| Perl | [index.pl](index.pl) | `HTTP::Tiny` + `JSON::PP` (core) |
+| Lua | [index.lua](index.lua) | `luasocket` + `luasec` + `lua-cjson` |
+| Bash | [index.sh](index.sh) | `curl` + `jq` |
+| PowerShell | [index.ps1](index.ps1) | `Invoke-RestMethod` |
+| Elixir | [index.exs](index.exs) | `Req` via `Mix.install` |
+| Scala 3 | [index.scala](index.scala) | `requests-scala` + `uJson` (scala-cli) |
+| Haskell | [index.hs](index.hs) | `http-conduit` + `aeson` |
+| R | [index.R](index.R) | `httr2` + `jsonlite` |
+
 ## Supported Game Providers
 
 | Category | Providers |
