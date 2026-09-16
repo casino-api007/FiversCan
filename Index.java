@@ -113,7 +113,7 @@ public class Index {
         }
 
         private static Map<String, Object> transferParams(String userCode, double amount, String agentSign) {
-            return agentSign == null
+            return agentSign == null || agentSign.isEmpty()
                     ? Map.of("user_code", userCode, "amount", amount)
                     : Map.of("user_code", userCode, "amount", amount, "agent_sign", agentSign);
         }
@@ -123,15 +123,18 @@ public class Index {
             return call("money_info", userCode == null ? Collections.emptyMap() : Map.of("user_code", userCode));
         }
 
-        // gameCode may be empty for live-casino providers to open the lobby; rtp is optional
+        // gameCode may be empty for live-casino providers to open the lobby.
+        // lobbyUrl and rtp are optional and are OMITTED when null/empty: the server rejects "lobby_url": "" (Joi string, empty not allowed)
         public JSONObject gameLaunch(String userCode, String providerCode, String gameCode, String lang, String lobbyUrl, Double rtp)
                 throws IOException, InterruptedException {
             JSONObject params = new JSONObject()
                     .put("user_code", userCode)
                     .put("provider_code", providerCode)
                     .put("game_code", gameCode == null ? "" : gameCode)
-                    .put("lang", lang)
-                    .put("lobby_url", lobbyUrl == null ? "" : lobbyUrl);
+                    .put("lang", lang);
+            if (lobbyUrl != null && !lobbyUrl.isEmpty()) {
+                params.put("lobby_url", lobbyUrl);
+            }
             if (rtp != null) {
                 params.put("rtp", rtp.doubleValue());
             }

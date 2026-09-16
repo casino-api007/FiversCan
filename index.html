@@ -1,0 +1,229 @@
+<!doctype html>
+<!--
+  NexusGGR / FiversCan API — HTML lobby sample
+  =============================================
+  A minimal player-facing lobby: pick a provider, pick a game, play it in an iframe, top up or cash out.
+  The browser NEVER talks to the FiversCan API directly (that would expose your agent_token) — every call
+  goes to api.php on your own server, which holds the credentials and forwards to the API.
+
+  Run:  FVS_API_URL=https://api.example.com FVS_AGENT_CODE=... FVS_AGENT_TOKEN=... php -S 127.0.0.1:8080
+        then open http://127.0.0.1:8080/index.html
+  API access: https://t.me/casino_api777  ·  https://nexusggr.games
+-->
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>NexusGGR Lobby — FiversCan API demo</title>
+  <link rel="stylesheet" href="index.css">
+</head>
+<body>
+  <header class="topbar">
+    <div class="brand">
+      <span class="brand-mark">N</span>
+      <span>NexusGGR Lobby <small>FiversCan API demo</small></span>
+    </div>
+    <div class="balances">
+      <div class="balance"><span>Agent</span><strong id="agent-balance">—</strong></div>
+      <div class="balance"><span>Player</span><strong id="user-balance">—</strong></div>
+    </div>
+  </header>
+
+  <main class="layout">
+    <aside class="panel">
+      <h2>Player</h2>
+      <p class="hint">Demo only: the player is typed here. On your site it comes from the logged-in session.</p>
+      <label class="field">
+        <span>User code</span>
+        <input id="user-code" value="demo_user" maxlength="32" pattern="[A-Za-z0-9_]+" autocomplete="off">
+      </label>
+      <button id="load-user" class="btn">Load balance</button>
+
+      <h2>Cashier</h2>
+      <label class="field">
+        <span>Amount</span>
+        <input id="amount" type="number" min="0.01" step="0.01" value="100">
+      </label>
+      <div class="row">
+        <button id="deposit" class="btn btn-primary">Deposit</button>
+        <button id="withdraw" class="btn">Withdraw</button>
+      </div>
+      <p class="hint">Deposit moves funds agent → player (user_deposit), withdraw moves them back (user_withdraw). The first deposit creates the player.</p>
+
+      <h2>Providers</h2>
+      <div id="providers" class="chips" role="group" aria-label="Providers"><span class="hint">loading…</span></div>
+    </aside>
+
+    <section class="content">
+      <div class="content-head">
+        <h2 id="games-title">Games</h2>
+        <span id="games-count" class="hint"></span>
+      </div>
+      <div id="games" class="grid"><span class="hint">pick a provider</span></div>
+    </section>
+  </main>
+
+  <div id="player" class="player" hidden>
+    <div class="player-bar">
+      <strong id="player-title">Game</strong>
+      <div class="row">
+        <a id="player-open" class="btn" target="_blank" rel="noopener">Open in new tab</a>
+        <button id="player-close" class="btn">Close</button>
+      </div>
+    </div>
+    <iframe id="player-frame" title="Game" allow="autoplay; fullscreen" allowfullscreen></iframe>
+  </div>
+
+  <div id="toast" class="toast" role="status" aria-live="polite" hidden></div>
+
+  <script>
+    // ---- api.php helper: GET with ?query or POST a JSON body; resolves {ok:true,...}, throws on {ok:false,error} ----
+    async function api(action, { query = {}, body } = {}) {
+      const url = `api.php?${new URLSearchParams({ action, ...query })}`;
+      const res = await fetch(url, body ? { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body) } : undefined);
+      const data = await res.json().catch(() => ({ ok: false, error: `HTTP ${res.status}` }));
+      if (!data.ok) throw new Error(data.error + (data.detail ? ` (${data.detail})` : ''));
+      return data;
+    }
+
+    const $ = (id) => document.getElementById(id);
+    const state = { provider: null, providers: [] };
+    const fmt = (n) => Number(n).toLocaleString(undefined, { maximumFractionDigits: 2 });
+    const userCode = () => $('user-code').value.trim();
+
+    let toastTimer;
+    function toast(message, isError = true) {
+      const el = $('toast');
+      el.textContent = message;
+      el.classList.toggle('toast-error', isError);
+      el.hidden = false;
+      clearTimeout(toastTimer);
+      toastTimer = setTimeout(() => { el.hidden = true; }, 4000);
+    }
+
+    function setBalances({ agent_balance, user_balance }) {
+      if (agent_balance !== undefined) $('agent-balance').textContent = fmt(agent_balance);
+      if (user_balance !== undefined) $('user-balance').textContent = fmt(user_balance);
+    }
+
+    async function loadBalance() {
+      setBalances(await api('balance', { query: { user: userCode() } }));
+    }
+
+    async function loadProviders() {
+      const { providers } = await api('providers');
+      state.providers = providers;
+      const box = $('providers');
+      box.innerHTML = '';
+      providers.forEach((p) => {
+        const chip = document.createElement('button');
+        chip.className = 'chip' + (p.status === 1 ? '' : ' chip-off');
+        chip.textContent = p.name || p.code;
+        chip.dataset.code = p.code;
+        chip.title = p.status === 1 ? p.code : `${p.code} — maintenance`;
+        chip.disabled = p.status !== 1;
+        chip.onclick = () => selectProvider(p).catch((e) => { toast(e.message); $('games').textContent = ''; });
+        box.appendChild(chip);
+      });
+      const first = providers.find((p) => p.status === 1);
+      if (first) await selectProvider(first);
+    }
+
+    async function selectProvider(p) {
+      state.provider = p;
+      document.querySelectorAll('.chip').forEach((c) => {
+        const active = c.dataset.code === p.code;
+        c.classList.toggle('chip-active', active);
+        c.setAttribute('aria-pressed', String(active));
+      });
+      $('games-title').textContent = p.name || p.code;
+      $('games').innerHTML = '<span class="hint">loading…</span>';
+      const { games } = await api('games', { query: { provider: p.code } });
+      if (state.provider !== p) return; // a later click won; drop this stale list
+      renderGames(games);
+    }
+
+    function renderGames(games) {
+      const grid = $('games');
+      grid.innerHTML = '';
+      $('games-count').textContent = `${games.length} games`;
+      if (!games.length) {
+        // Live-casino providers may return no per-table list: launching with an empty game_code opens their lobby
+        const card = gameCard({ game_code: '', game_name: `${state.provider.name || state.provider.code} lobby` });
+        grid.appendChild(card);
+        return;
+      }
+      games.forEach((g) => grid.appendChild(gameCard(g)));
+    }
+
+    function gameCard(g) {
+      const card = document.createElement('article');
+      card.className = 'card' + (g.status === 0 ? ' card-off' : '');
+      const img = document.createElement('img');
+      img.loading = 'lazy';
+      img.alt = '';
+      img.src = g.banner || '';
+      img.onerror = () => { img.remove(); card.classList.add('card-noimg'); };
+      const name = document.createElement('h3');
+      name.textContent = typeof g.game_name === 'object' ? (g.game_name.en || Object.values(g.game_name)[0]) : (g.game_name || g.game_code);
+      const code = document.createElement('small');
+      code.textContent = g.game_code || 'lobby';
+      const play = document.createElement('button');
+      play.className = 'btn btn-primary';
+      play.textContent = g.status === 0 ? 'Maintenance' : 'Play';
+      play.disabled = g.status === 0;
+      play.onclick = () => launch(g, name.textContent);
+      card.append(img, name, code, play);
+      return card;
+    }
+
+    async function launch(g, title) {
+      try {
+        const { launch_url } = await api('launch', { body: { user: userCode(), provider: state.provider.code, game: g.game_code, lang: navigator.language.slice(0, 2) || 'en' } });
+        const url = new URL(launch_url, location.href);
+        if (!/^https?:$/.test(url.protocol)) throw new Error('unexpected launch URL'); // never load javascript: etc. into the page
+        $('player-title').textContent = title;
+        $('player-open').href = url.href;
+        $('player-frame').src = url.href;
+        $('player').hidden = false;
+      } catch (err) {
+        toast(err.message);
+      }
+    }
+
+    async function transfer(action) {
+      const amount = Number($('amount').value);
+      if (!(amount > 0)) return toast('enter an amount greater than 0');
+      const buttons = [$('deposit'), $('withdraw')];
+      buttons.forEach((b) => { b.disabled = true; }); // one transfer at a time: a double-click must not send two
+      try {
+        setBalances(await api(action, { body: { user: userCode(), amount } }));
+        toast(`${action} ok`, false);
+      } catch (err) {
+        toast(err.message);
+      } finally {
+        buttons.forEach((b) => { b.disabled = false; });
+      }
+    }
+
+    $('load-user').onclick = () => loadBalance().catch((e) => toast(e.message));
+    $('user-code').addEventListener('change', () => loadBalance().catch((e) => toast(e.message)));
+    $('deposit').onclick = () => transfer('deposit');
+    $('withdraw').onclick = () => transfer('withdraw');
+    $('player-close').onclick = () => {
+      $('player').hidden = true;
+      $('player-frame').src = 'about:blank';
+      loadBalance().catch(() => {}); // the balance moved while the player was in the game
+    };
+
+    (async () => {
+      try {
+        await loadProviders();
+        await loadBalance();
+      } catch (err) {
+        toast(err.message);
+      }
+    })();
+  </script>
+</body>
+</html>

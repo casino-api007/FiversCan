@@ -27,7 +27,7 @@ Built for **FiversCan**-compatible workflows and modern aggregator architectures
 - **Agent & Operator Panels** — Manage players, agents, reports, and settlements
 - **Fast Deployment** — Launch your iGaming platform in days, not months
 
-## Integration Code Samples (22 Languages)
+## Integration Code Samples
 
 Every `index.*` file in this repository is a complete, runnable **FiversCan API** client that walks the same seven calls an operator needs to go live: `provider_list` → `game_list` → `user_create` → `user_deposit` → `game_launch` → `money_info` → `user_withdraw`.
 
@@ -35,28 +35,29 @@ The API contract is identical in every language — `POST https://{API_SERVER}` 
 
 | Language | File | Stack |
 |----------|------|-------|
-| JavaScript (Node.js) | [index.js](index.js) | built-in `fetch` |
+| JavaScript (Node.js 18+) | [index.js](index.js) | built-in `fetch` |
 | TypeScript | [index.ts](index.ts) | `fetch`, typed responses |
-| Python | [index.py](index.py) | `urllib` (stdlib) |
-| PHP | [index.php](index.php) | `ext-curl` + `ext-json` |
 | Go | [index.go](index.go) | `net/http` + `encoding/json` |
-| Java | [Index.java](Index.java) | `java.net.http` + `org.json` |
-| Kotlin | [index.kt](index.kt) | `java.net.http` + `kotlinx.serialization.json` |
-| C# (.NET) | [index.cs](index.cs) | `HttpClient` + `System.Text.Json` |
-| Ruby | [index.rb](index.rb) | `net/http` + `json` (stdlib) |
-| Rust | [index.rs](index.rs) | `reqwest` + `serde_json` |
-| Swift | [index.swift](index.swift) | `URLSession` + `JSONSerialization` |
-| Dart | [index.dart](index.dart) | `dart:io` + `dart:convert` |
-| C++ | [index.cpp](index.cpp) | `libcurl` + `nlohmann/json` |
-| C | [index.c](index.c) | `libcurl` + `cJSON` |
-| Perl | [index.pl](index.pl) | `HTTP::Tiny` + `JSON::PP` (core) |
-| Lua | [index.lua](index.lua) | `luasocket` + `luasec` + `lua-cjson` |
-| Bash | [index.sh](index.sh) | `curl` + `jq` |
-| PowerShell | [index.ps1](index.ps1) | `Invoke-RestMethod` |
-| Elixir | [index.exs](index.exs) | `Req` via `Mix.install` |
-| Scala 3 | [index.scala](index.scala) | `requests-scala` + `uJson` (scala-cli) |
-| Haskell | [index.hs](index.hs) | `http-conduit` + `aeson` |
-| R | [index.R](index.R) | `httr2` + `jsonlite` |
+| Java 11+ | [Index.java](Index.java) | `java.net.http` + `org.json` |
+| PHP 8.1+ | [index.php](index.php) | `ext-curl` + `ext-json`, via [FiversCanClient.php](FiversCanClient.php) |
+
+### PHP integration kit (transfer + seamless)
+
+The PHP files go beyond the walkthrough and form a small working operator site:
+
+| File | Role |
+|------|------|
+| [FiversCanClient.php](FiversCanClient.php) | Reusable namespaced client (`FiversCan\FiversCanClient`) wrapping the agent API, including `transfer_status` to resolve a timed-out deposit/withdraw |
+| [api.php](api.php) | Lobby backend: the browser calls this, this calls the API — your `agent_token` never leaves the server. Caches the catalogue (the API allows one `provider_list`/`game_list` call per second) |
+| [gold_api.php](gold_api.php) | **Seamless wallet** endpoint (`user_balance` + `transaction`) the game server calls on your site: `agent_secret` check, `txn_id_v2` idempotency, `INSUFFICIENT_USER_FUNDS` handling |
+| [index.html](index.html) + [index.css](index.css) | Player lobby UI: providers, game grid, deposit / withdraw, in-page game player |
+
+```bash
+FVS_API_URL=https://api.example.com FVS_AGENT_CODE=... FVS_AGENT_TOKEN=... FVS_AGENT_SECRET=... php -S 127.0.0.1:8080
+# open http://127.0.0.1:8080/index.html
+```
+
+**Transfer vs. seamless.** With a *transfer* agent the player balance lives at NexusGGR and the lobby's Deposit / Withdraw buttons move money through `user_deposit` / `user_withdraw`. With a *seamless* agent the balance lives on your site: the game server calls `https://{YOUR_SITE}/gold_api` (no `.php` — route that path to `gold_api.php`, see its header) for every balance check and bet, and the API refuses `user_deposit`/`user_withdraw`/`user_create`, so your own cashier funds the ledger instead. Players are created automatically by the API on their first deposit or game launch.
 
 ## Supported Game Providers
 

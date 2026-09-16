@@ -175,10 +175,11 @@ type LaunchParams struct {
 	ProviderCode string
 	GameCode     string   // may be empty for live-casino providers to open the lobby
 	Lang         string   // e.g. "en"
-	LobbyURL     string   // where the player lands when leaving the game
+	LobbyURL     string   // optional: where the player lands when leaving the game
 	RTP          *float64 // optional target RTP for this launch
 }
 
+// GameLaunch omits lobby_url and rtp when unset: the server rejects "lobby_url": "" (Joi string, empty not allowed).
 func (c *FiversCanClient) GameLaunch(p LaunchParams) (*APIResponse, error) {
 	if p.Lang == "" {
 		p.Lang = "en"
@@ -188,7 +189,9 @@ func (c *FiversCanClient) GameLaunch(p LaunchParams) (*APIResponse, error) {
 		"provider_code": p.ProviderCode,
 		"game_code":     p.GameCode,
 		"lang":          p.Lang,
-		"lobby_url":     p.LobbyURL,
+	}
+	if p.LobbyURL != "" {
+		params["lobby_url"] = p.LobbyURL
 	}
 	if p.RTP != nil {
 		params["rtp"] = *p.RTP

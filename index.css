@@ -1,0 +1,160 @@
+/*
+  NexusGGR / FiversCan API — lobby styles for index.html
+  =======================================================
+  Plain CSS, no framework: a dark casino theme with a sidebar (player, cashier, providers), a responsive
+  game grid, an overlay player (iframe) and a toast for API errors. Swap the --brand tokens for your own.
+  API access: https://t.me/casino_api777  ·  https://nexusggr.games
+*/
+
+:root {
+  --bg: #0f1218;
+  --bg-elev: #171c25;
+  --bg-card: #1d2330;
+  --line: #2a3242;
+  --text: #e8ecf3;
+  --muted: #8b95a7;
+  --brand: #f5b700;
+  --brand-ink: #1a1400;
+  --danger: #ff5a5f;
+  --ok: #2ecc71;
+  --radius: 12px;
+  --shadow: 0 10px 30px rgba(0, 0, 0, 0.35);
+  color-scheme: dark;
+}
+
+* { box-sizing: border-box; }
+
+html, body { margin: 0; min-height: 100%; }
+
+body {
+  font: 15px/1.45 system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  color: var(--text);
+  background: radial-gradient(1200px 600px at 20% -10%, #24304a 0%, var(--bg) 55%) fixed;
+}
+
+h2 { font-size: 13px; letter-spacing: 0.08em; text-transform: uppercase; color: var(--muted); margin: 22px 0 10px; }
+h2:first-child { margin-top: 0; }
+h3 { margin: 0; font-size: 15px; }
+
+/* ---- top bar ---- */
+.topbar {
+  position: sticky; top: 0; z-index: 5;
+  display: flex; align-items: center; justify-content: space-between; gap: 16px;
+  padding: 12px 20px;
+  background: rgba(15, 18, 24, 0.85);
+  backdrop-filter: blur(8px);
+  border-bottom: 1px solid var(--line);
+}
+.brand { display: flex; align-items: center; gap: 10px; font-weight: 700; }
+.brand small { display: block; font-weight: 400; color: var(--muted); font-size: 12px; }
+.brand-mark {
+  width: 34px; height: 34px; border-radius: 9px; display: grid; place-items: center;
+  background: var(--brand); color: var(--brand-ink); font-weight: 900;
+}
+.balances { display: flex; gap: 10px; }
+.balance {
+  display: flex; flex-direction: column; min-width: 110px;
+  padding: 6px 12px; border-radius: var(--radius);
+  background: var(--bg-elev); border: 1px solid var(--line);
+}
+.balance span { font-size: 11px; color: var(--muted); text-transform: uppercase; letter-spacing: 0.06em; }
+.balance strong { font-variant-numeric: tabular-nums; }
+
+/* ---- layout ---- */
+.layout {
+  display: grid; grid-template-columns: 280px 1fr; gap: 20px;
+  padding: 20px; max-width: 1400px; margin: 0 auto;
+}
+.panel {
+  align-self: start; position: sticky; top: 76px;
+  padding: 18px; border-radius: var(--radius);
+  background: var(--bg-elev); border: 1px solid var(--line);
+}
+.content-head { display: flex; align-items: baseline; justify-content: space-between; }
+.hint { color: var(--muted); font-size: 12px; margin: 6px 0 0; }
+
+/* ---- form controls ---- */
+.field { display: block; margin: 8px 0; }
+.field span { display: block; font-size: 12px; color: var(--muted); margin-bottom: 4px; }
+.field input {
+  width: 100%; padding: 9px 11px; border-radius: 8px;
+  border: 1px solid var(--line); background: var(--bg); color: var(--text); font: inherit;
+}
+.field input:focus { outline: 2px solid var(--brand); outline-offset: 1px; border-color: transparent; }
+.row { display: flex; gap: 8px; margin-top: 8px; }
+
+.btn {
+  display: inline-flex; align-items: center; justify-content: center;
+  padding: 9px 14px; border-radius: 8px; cursor: pointer; text-decoration: none;
+  border: 1px solid var(--line); background: var(--bg-card); color: var(--text); font: inherit; font-weight: 600;
+  transition: transform 0.08s ease, background 0.15s ease;
+}
+.btn:hover { background: #253044; }
+.btn:active { transform: translateY(1px); }
+.btn:disabled { opacity: 0.45; cursor: not-allowed; }
+.btn-primary { background: var(--brand); color: var(--brand-ink); border-color: transparent; }
+.btn-primary:hover { background: #ffc61a; }
+.row .btn { flex: 1; }
+
+/* ---- provider chips ---- */
+.chips { display: flex; flex-wrap: wrap; gap: 6px; }
+.chip {
+  padding: 6px 11px; border-radius: 999px; cursor: pointer; font: inherit; font-size: 13px;
+  border: 1px solid var(--line); background: var(--bg); color: var(--text);
+}
+.chip:hover { border-color: var(--brand); }
+.chip-active { background: var(--brand); color: var(--brand-ink); border-color: transparent; font-weight: 700; }
+.chip-off { opacity: 0.45; cursor: not-allowed; text-decoration: line-through; }
+
+/* ---- game grid ---- */
+.grid {
+  display: grid; gap: 14px;
+  grid-template-columns: repeat(auto-fill, minmax(170px, 1fr));
+}
+.card {
+  display: flex; flex-direction: column; gap: 6px;
+  padding: 10px; border-radius: var(--radius);
+  background: var(--bg-card); border: 1px solid var(--line);
+  transition: transform 0.12s ease, border-color 0.12s ease;
+}
+.card:hover { transform: translateY(-2px); border-color: #3a4560; }
+.card img { width: 100%; aspect-ratio: 1 / 1; object-fit: cover; border-radius: 8px; background: var(--bg); }
+.card-noimg::before {
+  content: "🎰"; display: grid; place-items: center; font-size: 40px;
+  width: 100%; aspect-ratio: 1 / 1; border-radius: 8px; background: var(--bg);
+}
+.card small { color: var(--muted); font-size: 11px; word-break: break-all; }
+.card .btn { margin-top: auto; }
+.card-off { opacity: 0.6; }
+
+/* ---- player overlay ---- */
+.player {
+  position: fixed; inset: 0; z-index: 10;
+  display: flex; flex-direction: column;
+  background: #000;
+}
+.player[hidden] { display: none; }
+.player-bar {
+  display: flex; align-items: center; justify-content: space-between; gap: 12px;
+  padding: 10px 16px; background: var(--bg-elev); border-bottom: 1px solid var(--line);
+}
+.player-bar .row { margin: 0; }
+.player iframe { flex: 1; width: 100%; border: 0; }
+
+/* ---- toast ---- */
+.toast {
+  position: fixed; left: 50%; bottom: 24px; z-index: 20; transform: translateX(-50%);
+  max-width: min(90vw, 520px); padding: 12px 16px; border-radius: 10px;
+  background: var(--ok); color: #04210f; font-weight: 600; box-shadow: var(--shadow);
+}
+.toast-error { background: var(--danger); color: #fff; }
+.toast[hidden] { display: none; }
+
+/* ---- small screens ---- */
+@media (max-width: 820px) {
+  .layout { grid-template-columns: 1fr; padding: 14px; }
+  .panel { position: static; }
+  .topbar { flex-wrap: wrap; }
+  .balances { width: 100%; }
+  .balance { flex: 1; }
+}

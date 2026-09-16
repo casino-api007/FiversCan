@@ -39,6 +39,7 @@ class FiversCanClient {
             method: "POST",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({ method, agent_code: this.agentCode, agent_token: this.agentToken, ...params }),
+            signal: AbortSignal.timeout(15_000),
         });
         if (!res.ok) throw new Error(`${method}: HTTP ${res.status}`);
 
@@ -73,15 +74,16 @@ class FiversCanClient {
         return this.call("money_info", userCode ? { user_code: userCode } : {});
     }
 
-    // game_code may be empty for live-casino providers to open the lobby; rtp is optional
-    gameLaunch({ userCode, providerCode, gameCode = "", lang = "en", lobbyUrl = "", rtp }) {
+    // game_code may be empty for live-casino providers to open the lobby.
+    // lobby_url and rtp are optional and must be OMITTED when unset: the server rejects "lobby_url": "" (Joi string, empty not allowed)
+    gameLaunch({ userCode, providerCode, gameCode = "", lang = "en", lobbyUrl, rtp }) {
         return this.call("game_launch", {
             user_code: userCode,
             provider_code: providerCode,
             game_code: gameCode,
             lang,
-            lobby_url: lobbyUrl,
-            ...(rtp !== undefined && { rtp }),
+            ...(lobbyUrl && { lobby_url: lobbyUrl }),
+            ...(rtp != null && { rtp }),
         });
     }
 }
